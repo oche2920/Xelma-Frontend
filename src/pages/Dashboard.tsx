@@ -9,6 +9,7 @@ import { useWalletStore, selectIsWalletConnected } from "../store/useWalletStore
 import { predictionsApi, ApiError } from "../lib/api-client";
 import { ConnectionStatus } from "../components/ConnectionStatus";
 import { useConnectionStatus } from "../hooks/useConnectionStatus";
+import ProfileSummaryCard from "../components/ProfileSummaryCard";
 
 interface DashboardProps {
   showNewsRibbon?: boolean;
@@ -119,6 +120,7 @@ const Dashboard = ({ showNewsRibbon = true }: DashboardProps) => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Center: Prediction controls (Issue: core prediction area) */}
           <div className="dashboard__center lg:col-span-1 flex flex-col gap-6">
+            <ProfileSummaryCard />
             <PredictionCard
               isWalletConnected={isWalletConnected}
               isRoundActive={isRoundActive}
