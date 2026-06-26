@@ -5,7 +5,7 @@ import Navbar from './components/Navbar';
 import Landing from './pages/Landing';
 import RouteFallback from './components/RouteFallback';
 import LazyBoundary from './components/LazyBoundary';
-import OfflineBanner from './components/OfflineBanner';
+import { OfflineBanner } from './components/OfflineBanner';
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const LegacyDashboard = lazy(() => import('./pages/LegacyDashboard'));

@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+
 import { useConnectionStatus } from '../hooks/useConnectionStatus';
+import { useState } from 'react';
 
 /**
  * Global offline banner displayed at the top of the app when the connection is lost.
  * It is dismissible and provides a "Reconnect" button that triggers a forced
  * reconnection via socketService.forceReconnect().
  */
-export function OfflineBanner() {
+export const OfflineBanner = () => {
   const { isDisconnected, reconnect } = useConnectionStatus();
   const [dismissed, setDismissed] = useState(false);
 
@@ -44,4 +45,3 @@ export function OfflineBanner() {
       </div>
     </div>
   );
-}
