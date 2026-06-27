@@ -8,6 +8,7 @@ import RouteFallback from './components/RouteFallback';
 import LazyBoundary from './components/LazyBoundary';
 import { OfflineBanner } from './components/OfflineBanner';
 
+const NotFound = lazy(() => import('./pages/NotFound'));
 const Dashboard = lazy(() => import(/* webpackChunkName: "dashboard" */ './pages/Dashboard'));
 const LegacyDashboard = lazy(() => import(/* webpackChunkName: "legacy-dashboard" */ './pages/LegacyDashboard'));
 const Leaderboard = lazy(() => import(/* webpackChunkName: "leaderboard" */ './components/Leaderboard'));
@@ -40,6 +41,7 @@ function App() {
               }
             />
             <Route path="/profile" element={<Profile />} />
+            <Route path="*" element={<Suspense fallback={<RouteFallback />}><NotFound /></Suspense>} />
           </Routes>
         </Suspense>
       </LazyBoundary>
