@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { socketService } from "../lib/socket";
 import { useConnectionStatus } from "../hooks/useConnectionStatus";
+import { useRoundStore, selectActiveChatChannelId } from "../store/useRoundStore";
 
 interface Message {
   id: string;
@@ -116,6 +117,10 @@ export function ChatSidebar({ showNewsRibbon = true }: ChatSidebarProps) {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { isConnected } = useConnectionStatus();
+  // Round-scoped chat channel: derived from the active round so users in
+  // round #42 only see round #42 messages. Falls back to CHAT_CHANNEL_FALLBACK
+  // when there is no active round (issue #185).
+  const channelId = useRoundStore(selectActiveChatChannelId);
 
   const scrollToBottom = (force = false) => {
     if (!messagesContainerRef.current) return;
@@ -181,11 +186,14 @@ export function ChatSidebar({ showNewsRibbon = true }: ChatSidebarProps) {
     };
   }, []);
 
-  // Listen for incoming chat:message events via socket
+  // Listen for incoming chat:message events via socket and stay subscribed
+  // to the channel for the active round. When the active round changes, the
+  // cleanup function leaves the previous channel and the next effect run
+  // joins the new one (issue #185).
   useEffect(() => {
     // Ensure socket is connected
     socketService.connect();
-    
+
     const unsubscribe = socketService.onChatMessage((data: ApiMessage) => {
       setMessages((prev) => {
         // De-duplicate: server echoes our own sends back through chat:message
@@ -194,13 +202,15 @@ export function ChatSidebar({ showNewsRibbon = true }: ChatSidebarProps) {
       });
     });
 
-    // Join chat channel
-    socketService.joinChat("general"); // TODO: Use dynamic channel ID
+    // Join this round's chat channel (or the fallback "general" channel
+    // when no active round is available).
+    socketService.joinChat(channelId);
 
     return () => {
       unsubscribe();
+      socketService.leaveChat(channelId);
     };
-  }, []);
+  }, [channelId]);
 
   const handleSendMessage = () => {
     if (!inputValue.trim() || !isConnected) return;
